@@ -51,3 +51,11 @@ findBookByISBN (GET)    - http://localhost:8080/services/library/books/book/{ISB
 findBooksByAuthor (GET) - http://localhost:8080/services/library/books/{author}
 borrowBook (PATCH)       - http://localhost:8080/services/library/books/borrow//{ISBN}
 returnBook (PATCH)       - http://localhost:8080/services/library/books/return/{ISBN}
+
+# Run application on terminal after mvn clean install 
+jara -jar target/library-management-system-0.0.1-SNAPSHOT.jar
+
+Use postman collection - LibraryManagementService.postman_collection.json
+Step 1 - Get JWT toekn
+Execute http://localhost:8080/login passing userName and password as 'test'
+Step 2 - set Authorization Bear token and execute other endpoints
