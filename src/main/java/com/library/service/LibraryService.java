@@ -20,12 +20,12 @@ public class LibraryService {
         library.addBook(book);
     }
 
-    @CacheEvict(value = "book")
+    @CacheEvict(value = "books")
     public void removeBook(final String isbn) {
         library.removeBook(isbn);
     }
 
-    @Cacheable(value = "book")
+    @Cacheable(value = "books")
     public Book findBookByISBN(final String isbn) {
         return library.findBookByISBN(isbn);
     }
