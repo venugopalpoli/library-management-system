@@ -26,6 +26,19 @@ class LibraryServiceIntegrationTest {
                     "password": "test"
                 }
             """;
+
+    private String exampleInvalidUser1 = """
+                {
+                    "userName": "venu",
+                    "password": "test"
+                }
+            """;
+
+    private String exampleInvalidUser2 = """
+                {
+                    "userName": "venu"
+                }
+            """;
     private String exampleBookJson = """
                 {
                     "isbn": "12345",
@@ -55,8 +68,18 @@ class LibraryServiceIntegrationTest {
                 }
             """;
 
+    private String exampleInvalidBook = """
+                {
+                    "isbn": "12347",
+                    "author": "TestAuthor",
+                    "publicationYear": 2023,
+                    "availableCopies": 1
+                }
+            """;
+
     @Test
     void testAddBook() throws Exception {
+
         // Get the jwt token by passing valid user credentials
         ResultActions resultActions = mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -76,6 +99,14 @@ class LibraryServiceIntegrationTest {
 
         //Remove book from the library
         removeBook(token);
+
+        //Unhappypath # Adding same Book to the library
+        mockMvc.perform(post("/services/library/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(exampleInvalidBook))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Book must have a valid ISBN, title, and author."));
     }
 
     @Test
@@ -86,7 +117,7 @@ class LibraryServiceIntegrationTest {
                 .content(exampleUserJson));
         String token = resultActions.andReturn().getResponse().getContentAsString();
 
-        //Finding Book by ISBN from the library which is not exist
+        //Unhappypath # Finding Book by ISBN from the library which is not exist
         mockMvc.perform(get("/services/library/books/book/12345")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
@@ -103,6 +134,12 @@ class LibraryServiceIntegrationTest {
 
         //Remove book from the library
         removeBook(token);
+
+        //Unhappypath # Finding Book by empty ISBN from the library
+        mockMvc.perform(get("/services/library/books/book/ ")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("ISBN must not be empty or null."));
     }
 
     @Test
@@ -113,11 +150,17 @@ class LibraryServiceIntegrationTest {
                 .content(exampleUserJson));
         String token = resultActions.andReturn().getResponse().getContentAsString();
 
-        //Finding Book by author from the library which is not exist
-        mockMvc.perform(get("/services/library/books/book/12345")
+        //Unhappypath # Finding Book by author from the library which is not exist
+        mockMvc.perform(get("/services/library/books/TestAuthor")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("No book is available with this isbn : 12345"));
+                .andExpect(content().string("No book is available with this author : TestAuthor"));
+
+        //Unhappypath # Finding Book by empty author from the library
+        mockMvc.perform(get("/services/library/books/ ")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Author must not be empty or null."));
 
         //Adding Book to the library
         addBook(token);
@@ -158,6 +201,12 @@ class LibraryServiceIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No book is available with this isbn : 12345"));
+
+        //Unhappypath # remove Book by empty ISBN from the library
+        mockMvc.perform(delete("/services/library/books/remove/ ")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("ISBN must not be empty or null."));
     }
 
     @Test
@@ -218,6 +267,12 @@ class LibraryServiceIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No book is available with this isbn : 12347"));
 
+        //Unhappypath # borrow Book by empty ISBN from the library
+        mockMvc.perform(patch("/services/library/books/borrow/ ")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("ISBN must not be empty or null."));
+
     }
 
     @Test
@@ -246,6 +301,28 @@ class LibraryServiceIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("No book is available with this isbn : 12345"));
+
+        //Unhappypath # borrow Book by empty ISBN from the library
+        mockMvc.perform(patch("/services/library/books/return/ ")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("ISBN must not be empty or null."));
+    }
+
+    @Test
+    void testInvalidUser() throws Exception {
+        // Unhappypath # Get the jwt token by passing invalid user credentials
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(exampleInvalidUser1))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Invalid Credentials"));
+
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(exampleInvalidUser2))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Please provide user credentials"));
     }
 
     private void addBook(String token) throws Exception {

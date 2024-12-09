@@ -31,7 +31,7 @@ public class JwtUtil {
     private final SecretKey secretKey;
 
     public String generateToken(final AuthenticationRequest authRequest) throws InvalidUserException {
-        if (authRequest == null) {
+        if (isEmpty(authRequest.getUserName()) || isEmpty(authRequest.getPassword())) {
             throw new InvalidUserException("Please provide user credentials");
         }
 
@@ -82,4 +82,11 @@ public class JwtUtil {
                 .getExpiration();
         return expiration.before(new Date());
     }
+    private boolean isEmpty(final String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
 }

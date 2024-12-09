@@ -14,6 +14,21 @@ public class BookExceptionHandler {
         return new ResponseEntity<>(bookNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidBookException.class)
+    public ResponseEntity<String> handleInvalidBookException(InvalidBookException invalidBookException) {
+        return new ResponseEntity<>(invalidBookException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidISBNException.class)
+    public ResponseEntity<String> handleInvalidISBNException(InvalidISBNException invalidISBNException) {
+        return new ResponseEntity<>(invalidISBNException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidAuthorException.class)
+    public ResponseEntity<String> handleInvalidAuthorException(InvalidAuthorException invalidAuthorException) {
+        return new ResponseEntity<>(invalidAuthorException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BookAlreadyExistException.class)
     public ResponseEntity<String> handleBookAlreadyExistException(BookAlreadyExistException bookAlreadyExistException) {
         return new ResponseEntity<>(bookAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
