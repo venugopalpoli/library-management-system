@@ -5,6 +5,7 @@ import com.library.model.Book;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +20,12 @@ public class LibraryService {
         library.addBook(book);
     }
 
-    @CacheEvict(value = "books", key = "#isbn")
+    @CacheEvict(value = "book")
     public void removeBook(final String isbn) {
         library.removeBook(isbn);
     }
 
-    @CachePut(value = "books", key = "#isbn")
+    @Cacheable(value = "book")
     public Book findBookByISBN(final String isbn) {
         return library.findBookByISBN(isbn);
     }
@@ -34,12 +35,10 @@ public class LibraryService {
         return library.findBooksByAuthor(author);
     }
 
-    @CachePut(value = "books", key = "#isbn")
     public void borrowBook(final String isbn) {
         library.borrowBook(isbn);
     }
 
-    @CachePut(value = "books", key = "#isbn")
     public void returnBook(final String isbn) {
         library.returnBook(isbn);
     }

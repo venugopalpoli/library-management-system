@@ -21,7 +21,7 @@ public class LibraryController {
     private final LibraryService libraryService;
 
     @PostMapping("/books")
-    public ResponseEntity<String> addBook(@RequestBody Book book) {
+    public ResponseEntity<String> postBook(@RequestBody Book book) {
         if (!isValid(book.getIsbn()) || !isValid(book.getTitle()) || !isValid(book.getAuthor())) {
             throw new InvalidBookException("Book must have a valid ISBN, title, and author.");
         }
@@ -30,7 +30,7 @@ public class LibraryController {
     }
 
     @GetMapping("/books/book/{isbn}")
-    public ResponseEntity<Book> findBookByISBN(@PathVariable String isbn) {
+    public ResponseEntity<Book> getBookByISBN(@PathVariable String isbn) {
         if (!isValid(isbn)) {
             throw new InvalidISBNException("ISBN must not be empty or null.");
         }
@@ -38,7 +38,7 @@ public class LibraryController {
     }
 
     @GetMapping("/books/{author}")
-    public ResponseEntity<List<Book>> findBooksByAuthor(@PathVariable String author) {
+    public ResponseEntity<List<Book>> getBooksByAuthor(@PathVariable String author) {
         if (!isValid(author)) {
             throw new InvalidAuthorException("Author must not be empty or null.");
         }
@@ -64,7 +64,7 @@ public class LibraryController {
     }
 
     @DeleteMapping("/books/remove/{isbn}")
-    public ResponseEntity<String> removeBook(@PathVariable String isbn) {
+    public ResponseEntity<String> deleteBook(@PathVariable String isbn) {
         if (!isValid(isbn)) {
             throw new InvalidISBNException("ISBN must not be empty or null.");
         }
